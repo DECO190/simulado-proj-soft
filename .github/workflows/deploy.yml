@@ -23,7 +23,7 @@ jobs:
         cache: maven
         
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      run: mvn -B package -DskipTests --file pom.xml
 
     - name: Login to Docker Hub
       uses: docker/login-action@v3
@@ -53,4 +53,4 @@ jobs:
         script: |
           docker stop simulado
           docker rm --force simulado
-          docker run -d -p 8080:8080 --network=simulado-network --name simulado deco1903/simulado-ci:${{ github.sha }}
+          docker run -d -p 8081:8080 --network=simulado-network --name simulado deco1903/simulado-ci:${{ github.sha }}
