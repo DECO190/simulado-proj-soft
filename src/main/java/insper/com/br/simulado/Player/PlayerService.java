@@ -4,6 +4,7 @@ import insper.com.br.simulado.Player.DTOs.UpdatePlayerDTO;
 import insper.com.br.simulado.Time.Time;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -21,9 +22,18 @@ public class PlayerService {
 
     private Time getTeam(String identifier) {
         RestTemplate restTemplate = new RestTemplate();
-        return restTemplate.getForEntity(
-                "http://campeonato:8080/time/" + identifier,
-                Time.class).getBody();
+
+        try {
+            ResponseEntity<Time> response = restTemplate.getForEntity("http://campeonato:8080/time/" + identifier, Time.class);
+
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Não foi possível consultar o time - " + identifier);
+            }
+
+            return response.getBody();
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Não foi possível consultar o time - " + identifier);
+        }
     }
 
     public List<Player> getPlayers() {
